@@ -8,18 +8,16 @@ public class PlayerInput : MonoBehaviour
 
     [SerializeField] private PlayerController playerScript;
     [SerializeField] private Shovel shovelScript;
-    [SerializeField] private LayerMask whatIsHole;
+    [SerializeField] private LayerMask cannotBeDug;
 
 
     private float digCoolDownTimer = 0f;
-    public float digCoolDown;
+    private float rockThrowCoolDownTimer = 0f;
+    public float digCoolDown, rockThrowCoolDown;
 
     public float digRadius;
     private bool alreadyDug;
     private float directionX, directionY;
-
-
-    private Animator anim;
 
     [Header("Events")]
     [Space]
@@ -39,49 +37,54 @@ public class PlayerInput : MonoBehaviour
             diggingEvent = new UnityEvent();
     }
 
-    private void Start()
-    {
-        anim = GetComponent<Animator>();
-        
-    }
     void Update()
     {
         directionX = Input.GetAxisRaw("Horizontal");
         directionY = Input.GetAxisRaw("Vertical");
 
-    if (digCoolDownTimer <= 0)
-    {
+        if (digCoolDownTimer <= 0)
+        {
             bool wasDug = alreadyDug;
-        alreadyDug = false;
+            alreadyDug = false;
 
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(shovelScript.digPosition.position, digRadius, whatIsHole);
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(shovelScript.digPosition.position, digRadius, cannotBeDug);
 
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            if (colliders[i].gameObject != gameObject)
+            for (int i = 0; i < colliders.Length; i++)
             {
-                alreadyDug = true;
-                if (wasDug)
-                    wasDugEvent.Invoke();
+                if (colliders[i].gameObject != gameObject)
+                {
+                    alreadyDug = true;
+                    if (wasDug)
+                        wasDugEvent.Invoke();
+                }
             }
-        }
-        if (Input.GetMouseButtonDown(0) && !wasDug)
+            if (Input.GetMouseButtonDown(0) && !wasDug)
+            {
+                shovelScript.DigHole();
+                digCoolDownTimer = digCoolDown;
+            }
+         }
+         else
         {
-            anim.SetBool("isDigging", true);
-            shovelScript.DigHole();
-            digCoolDownTimer = digCoolDown;
+                digCoolDownTimer -= Time.deltaTime;
+        }
+        
+        if (rockThrowCoolDownTimer <= 0)
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                shovelScript.ThrowRock();
+                rockThrowCoolDownTimer = digCoolDown;
+            }
         }
         else
         {
-            anim.SetBool("isDigging", false);
+            rockThrowCoolDownTimer -= Time.deltaTime;
         }
-     }
-     else
-     {
-            digCoolDownTimer -= Time.deltaTime;
-     }
 
     }
+
+
 
     private void FixedUpdate()
     {
