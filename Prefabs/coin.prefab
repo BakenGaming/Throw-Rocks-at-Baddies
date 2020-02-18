@@ -112,4 +112,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moneyValue: 10
-  playerScript: {fileID: 0}
+  lifetime: 10
