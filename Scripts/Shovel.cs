@@ -8,6 +8,7 @@ public class Shovel : MonoBehaviour
     public Transform digPosition;
     private AudioManager audioManager;
     private Animator anim;
+    private PlayerProperties playerPropertiesScript;
 
     public int[] table = { 60, 25, 10, 5 };
     private int itemToSpawn;
@@ -19,6 +20,7 @@ public class Shovel : MonoBehaviour
 
     void Start()
     {
+        playerPropertiesScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerProperties>();
         audioManager = AudioManager.instance;
         if (audioManager == null)
         {
@@ -54,7 +56,18 @@ public class Shovel : MonoBehaviour
     }
     public void ThrowRock()
     {
-        Instantiate(rockPrefab, throwPosition.position, transform.rotation);
+        if (playerPropertiesScript.currentAmmo >= 1)
+        {
+            Instantiate(rockPrefab, throwPosition.position, transform.rotation);
+            audioManager.PlaySound("ThrowRock");
+            playerPropertiesScript.ReduceAmmo();
+        }
+        else
+        {
+            Debug.Log("NO AMMO");
+            //play sound click
+        }
+        
     }
 
     private int FindItem()

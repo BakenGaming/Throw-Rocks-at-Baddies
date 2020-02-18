@@ -25,12 +25,16 @@ public class PlayerProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-      
+        if (collision.tag == "Enemy")
+        {
+            collision.GetComponent<EnemyProperties>().TakeDamage(damageValue);
+            DestroyProjectile();
+        }
     }
     void DestroyProjectile()
     {
         //Instantiate(explosion, transform.position, Quaternion.identity);
-        Destroy(gameObject);
+        Destroy(this.gameObject);
     }
 
 }

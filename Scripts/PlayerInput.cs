@@ -10,6 +10,7 @@ public class PlayerInput : MonoBehaviour
     [SerializeField] private Shovel shovelScript;
     [SerializeField] private LayerMask cannotBeDug;
 
+    private PlayerProperties ppscript;
 
     private float digCoolDownTimer = 0f;
     private float rockThrowCoolDownTimer = 0f;
@@ -37,10 +38,23 @@ public class PlayerInput : MonoBehaviour
             diggingEvent = new UnityEvent();
     }
 
+    private void Start()
+    {
+        ppscript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerProperties>();
+    }
     void Update()
     {
         directionX = Input.GetAxisRaw("Horizontal");
         directionY = Input.GetAxisRaw("Vertical");
+
+        if (directionX > 0)
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        else if (directionX < 0)
+        {
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
 
         if (digCoolDownTimer <= 0)
         {
@@ -81,10 +95,7 @@ public class PlayerInput : MonoBehaviour
         {
             rockThrowCoolDownTimer -= Time.deltaTime;
         }
-
     }
-
-
 
     private void FixedUpdate()
     {
